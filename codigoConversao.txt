@@ -1,0 +1,6 @@
+Rich text format (RTF)= 6
+PDF format= 17
+OpenDocument Text format(ODT)= 23
+DOCX format=16
+
+https://docs.microsoft.com/en-us/office/vba/api/word.wdsaveformat
