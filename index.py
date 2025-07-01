@@ -1,38 +1,36 @@
-import cgi
-import webbrowser
-import glob
-import win32com.client
 import os
-import datetime
 import sys
-print("Python version")
-print(sys.version)
-print("Version info.")
-print(sys.version_info)
+import urllib.request
+import win32com.client
 
-word = win32com.client.Dispatch("Word.Application")
-word.visible = 0
-txtDir = "C:/Users/" # dir to save archive(exe: "C:/Users/")
-url ='https://archive.pdf' #url get archive
-pdfs_path = "" # folder where the .pdf files are stored
-#for i, doc in enumerate(glob.iglob(pdfs_path+"*.pdf")): if more archive
-doc =url
-print('acess o archive')
-print(doc)
-filename = doc.split('/')[-1]
-in_file = os.path.abspath(doc)
-print('in file:'+in_file)
-wb = word.Documents.Open(url)
-print(wb)
-out_file = os.path.abspath(txtDir +filename[0:-4]+ ".docx".format()) #extension archive
+def baixar_pdf(url, caminho_destino):
+    try:
+        urllib.request.urlretrieve(url, caminho_destino)
+        print(f"PDF baixado com sucesso: {caminho_destino}")
+        return True
+    except Exception as e:
+        print(f"Erro ao baixar PDF: {e}")
+        return False
 
-print("outfile\n",out_file)
+def converter_pdf_para_docx(caminho_pdf, caminho_docx):
+    try:
+        word = win32com.client.Dispatch("Word.Application")
+        word.Visible = False
+        doc = word.Documents.Open(caminho_pdf)
+        doc.SaveAs2(caminho_docx, FileFormat=16)  # .docx
+        doc.Close()
+        word.Quit()
+        print(f"Conversão concluída: {caminho_docx}")
+    except Exception as e:
+        print(f"Erro ao converter PDF: {e}")
 
-wb.SaveAs2(out_file, FileFormat=16) # cod format archive
+if __name__ == "__main__":
+    url = "https://exemplo.com/meuarquivo.pdf"
+    nome_pdf = url.split('/')[-1]
+    pasta_destino = os.path.expanduser("~/Downloads/")
 
-print("success...")
-wb.Close()
+    caminho_pdf = os.path.join(pasta_destino, nome_pdf)
+    caminho_docx = os.path.join(pasta_destino, nome_pdf.replace(".pdf", ".docx"))
 
-word.Quit()
-
-
+    if baixar_pdf(url, caminho_pdf):
+        converter_pdf_para_docx(caminho_pdf, caminho_docx)
